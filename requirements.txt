@@ -1,0 +1,6 @@
+torch
+torchvision
+tifffile
+tqdm
+pandas
+scipy

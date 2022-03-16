@@ -186,7 +186,7 @@ class prostateDataset(Dataset):
         img_path = f"{self.destination_folder}/{img_name}/{img_id}.jpg"
 
         image = read_image(img_path)
-        label = (0,0) if img_label == "negative" else tuple([int(x) for x in img_label.split("+")])
+        label = [0,0] if img_label == "negative" else [int(x) for x in img_label.split("+")]
 
         # Applying random transformation
         transformations = []

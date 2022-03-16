@@ -182,7 +182,8 @@ class prostateDataset(Dataset):
             img_id = img_metadata["path"].split("/")[-1].split(".")[0]
         else:
             img_id = str(img_metadata["id"])
-        img_path = f"{self.destination_folder}/{img_id}.jpg"
+        img_name = img_metadata["image_name"]
+        img_path = f"{self.destination_folder}/{img_name}/{img_id}.jpg"
 
         image = read_image(img_path)
         label = (0,0) if img_label == "negative" else tuple([int(x) for x in img_label.split("+")])

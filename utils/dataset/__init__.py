@@ -8,6 +8,7 @@ from PIL import Image
 from scipy.sparse import csr_matrix
 from torchvision.io import read_image
 from torch import nn
+import torch
 from torchvision import transforms
 
 class prostateDataset(Dataset):
@@ -187,6 +188,7 @@ class prostateDataset(Dataset):
 
         image = read_image(img_path)
         label = [0,0] if img_label == "negative" else [int(x) for x in img_label.split("+")]
+        label = torch.tensor(label)
 
         # Applying random transformation
         transformations = []

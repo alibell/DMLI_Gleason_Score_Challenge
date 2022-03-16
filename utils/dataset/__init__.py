@@ -169,15 +169,20 @@ class prostateDataset(Dataset):
                     "image_path":image_path,
                     "image_name":image_name,
                     "offset":window,
-                    "path":image_output_path
+                    "path":image_output_path,
+                    "id":i
                 })
                 
         return output_images
 
     def __getitem__(self, index):
         img_metadata = self.metadatas[index]
-        img_path = img_metadata["path"]
         img_label = img_metadata["gleason_score"]
+        if "id" not in img_metadata.keys():
+            img_id = img_metadata["path"].split("/")[-1].split(".")[0]
+        else:
+            img_id = str(img_metadata["id"])
+        img_path = f"{self.destination_folder}/{img_id}.jpg"
 
         image = read_image(img_path)
         label = (0,0) if img_label == "negative" else tuple([int(x) for x in img_label.split("+")])

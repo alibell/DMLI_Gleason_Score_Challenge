@@ -6,6 +6,9 @@ from tqdm import tqdm
 import pickle
 from PIL import Image
 from scipy.sparse import csr_matrix
+from torchvision.io import read_image
+from torch import nn
+from torchvision import transforms
 
 class prostateDataset(Dataset):
     """
@@ -25,6 +28,8 @@ class prostateDataset(Dataset):
                 slidding_y = 300, 
                 windows_size_x=500, 
                 windows_size_y=500, 
+                hflip=False,
+                vflip=False,
                 reset=False,
                 verbose=True):
         """
@@ -37,6 +42,8 @@ class prostateDataset(Dataset):
             slidding_y: int, size of the y sliding
             windows_size_x: int, width of the windows
             windows_size_y: int, height of the windows
+            hflip: boolean, if True a random hflip is performed
+            vflip: boolean, if True a random vflip is performed
             reset: Boolean, if true the folder is cleaned
             verbose: Boolean, if true the informations are verbosed
         """
@@ -52,6 +59,8 @@ class prostateDataset(Dataset):
         self.slidding = (slidding_x, slidding_y)
         self.windows = (windows_size_x, windows_size_y)
         self.verbose = verbose
+        self.hflip = hflip
+        self.vflip = vflip
 
         # Cleaning output folder
         for folder in [output_folder, self.destination_folder]:
@@ -80,11 +89,13 @@ class prostateDataset(Dataset):
             # Writting metadata
             pickle.dump(self.metadatas, open(self.metadata_path, "wb"))
 
+    def __len__ (self):
+        return len(self.metadatas)
+
     def _load_tiff (self, image_path):
         image = tifffile.imread(image_path)
         
         return image
-
     
     def _get_windows_location (self, row, col, image_shape, slidding, windows):
         start_row = row*slidding[1]
@@ -162,3 +173,23 @@ class prostateDataset(Dataset):
                 })
                 
         return output_images
+
+    def __getitem__(self, index):
+        img_metadata = self.metadatas[index]
+        img_path = img_metadata["path"]
+        img_label = img_metadata["gleason_score"]
+
+        image = read_image(img_path)
+        label = (0,0) if img_label == "negative" else tuple([int(x) for x in img_label.split("+")])
+
+        # Applying random transformation
+        transformations = []
+        if self.hflip:
+            transformations.append(transforms.RandomHorizontalFlip())
+        if self.vflip:
+            transformations.append(transforms.RandomVerticalFlip())
+
+        if len(transformations) > 0:
+            image = nn.Sequential(*transformations)(image)
+
+        return image, label

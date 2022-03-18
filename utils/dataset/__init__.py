@@ -33,6 +33,7 @@ class prostateDataset(Dataset):
                 hflip=False,
                 vflip=False,
                 reset=False,
+                remove_last=True,
                 verbose=True):
         """
             Parameters:
@@ -48,6 +49,7 @@ class prostateDataset(Dataset):
             vflip: boolean, if True a random vflip is performed
             reset: Boolean, if true the folder is cleaned
             verbose: Boolean, if true the informations are verbosed
+            remove_last: Boolean, hotfix, remove the last image
         """
 
         super().__init__()
@@ -97,6 +99,10 @@ class prostateDataset(Dataset):
 
             # Writting metadata
             pickle.dump(self.metadatas, open(self.metadata_path, "wb"))
+        
+        if remove_last:
+            metadatas_id = dict([(x["image_name"], x["id"]) for x in self.metadatas])
+            self.metadatas = [x for x in self.metadatas if x["id"] != metadatas_id[x["image_name"]]]
 
     def __len__ (self):
         return len(self.metadatas)

@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset
 import tifffile
 import shutil
+import copy
 import os
 from tqdm import tqdm
 import pickle
@@ -201,3 +202,26 @@ class prostateDataset(Dataset):
             image = nn.Sequential(*transformations)(image)
 
         return image, label
+
+    def get_image_list (self):
+        """
+            Get the list of original images
+
+            Output:
+            -------
+            [str], list of images name
+        """
+
+        image_list = list(set([x["image_name"] for x in self.metadatas]))
+
+        return image_list
+
+    def get_subdataset (self, image_name):
+        """
+            Return subdataset of all images from an original image
+        """
+
+        new_dataset = copy.deepcopy(self)
+        new_dataset.metadatas = [x for x in new_dataset.metadatas if x["image_name"] == image_name]
+
+        return new_dataset

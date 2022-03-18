@@ -33,7 +33,6 @@ class prostateDataset(Dataset):
                 hflip=False,
                 vflip=False,
                 reset=False,
-                remove_last=True,
                 verbose=True):
         """
             Parameters:
@@ -100,10 +99,6 @@ class prostateDataset(Dataset):
             # Writting metadata
             pickle.dump(self.metadatas, open(self.metadata_path, "wb"))
         
-        if remove_last:
-            metadatas_id = dict([(x["image_name"], x["id"]) for x in self.metadatas])
-            self.metadatas = [x for x in self.metadatas if x["id"] != metadatas_id[x["image_name"]]]
-
     def __len__ (self):
         return len(self.metadatas)
 
@@ -178,7 +173,6 @@ class prostateDataset(Dataset):
                 Image.fromarray(
                     image[window[0]:window[1], window[2]:window[3], :]
                 ).save(image_output_path)
-                i += 1
                 
                 output_images.append({
                     "image_path":image_path,
@@ -187,6 +181,7 @@ class prostateDataset(Dataset):
                     "path":image_output_path,
                     "id":i
                 })
+                i += 1
                 
         return output_images
 

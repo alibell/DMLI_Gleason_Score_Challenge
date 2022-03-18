@@ -84,8 +84,14 @@ class prostateDataset(Dataset):
                 image_id = x["image_id"]
                 metadata = self._create_images(f"{self.images_folder}/{image_id}.tiff")
                 for i in range(len(metadata)):
-                    metadata[i]["isup_grade"] = x["isup_grade"]
-                    metadata[i]["gleason_score"] = x["gleason_score"]
+                    if "isup_grade" in x.keys():
+                        metadata[i]["isup_grade"] = x["isup_grade"]
+                    else:
+                        metadata[i]["isup_grade"] = None
+                    if "gleason_score" in x.keys():
+                        metadata[i]["gleason_score"] = x["gleason_score"]
+                    else:
+                        metadata[i]["gleason_score"] = None
                 
                 self.metadatas += metadata
 

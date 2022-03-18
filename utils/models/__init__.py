@@ -97,6 +97,7 @@ class Model1 (nn.Module):
         self.eval()
         with torch.no_grad():
             y_hat = self.forward(x)
+            
             # Also returning loss_weight
             loss_weight = (x != 1).float().mean()
             

@@ -34,7 +34,8 @@ def get_prediction(model, dataset, device):
 
         for x, y in image_dataloader:
             x = x.float().to(device)
-            score_1, score_2, isup = model.predict(x)
+            y_hat, loss_weight = model.predict(x)
+            score_1, score_2, isup = y_hat
             
             scores_1.append(score_1)
             scores_2.append(score_2)

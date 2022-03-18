@@ -34,19 +34,19 @@ class Model1 (nn.Module):
             nn.BatchNorm1d(32),
             nn.Linear(32, 16),
             nn.ReLU(),
-            nn.BatchNorm1d(32),
+            nn.BatchNorm1d(16),
         ])
         
         self.score_1 = nn.Sequential(*[
-            nn.Linear(32, 6),
+            nn.Linear(16, 6),
         ])
 
         self.score_2 = nn.Sequential(*[
-            nn.Linear(32, 6)
+            nn.Linear(16, 6)
         ])
 
         self.isup = nn.Sequential(*[
-            nn.Linear(32, 6)
+            nn.Linear(16, 6)
         ])
         
         self.optim = optim.Adam(self.parameters())

@@ -196,8 +196,11 @@ class prostateDataset(Dataset):
         img_path = f"{self.destination_folder}/{img_name}/{img_id}.jpg"
 
         image = read_image(img_path)
-        label = [0,0, img_label_isup] if img_label == "negative" else ([int(x) for x in img_label.split("+")] + [img_label_isup])
-        label = torch.tensor(label)
+        if img_label is not None:
+            label = [0,0, img_label_isup] if img_label == "negative" else ([int(x) for x in img_label.split("+")] + [img_label_isup])
+            label = torch.tensor(label)
+        else:
+            label = None
         
 
         # Applying random transformation

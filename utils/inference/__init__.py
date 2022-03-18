@@ -20,6 +20,8 @@ def get_prediction(model, dataset, device):
 
     predictions = {}
     
+    model = model.to(device)
+
     for image_name in tqdm(dataset.get_image_list()):
         image_dataset = dataset.get_subdataset(image_name)
         image_dataset.transform = False

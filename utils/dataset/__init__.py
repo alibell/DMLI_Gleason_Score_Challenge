@@ -200,7 +200,7 @@ class prostateDataset(Dataset):
             label = [0,0, img_label_isup] if img_label == "negative" else ([int(x) for x in img_label.split("+")] + [img_label_isup])
             label = torch.tensor(label)
         else:
-            label = None
+            label = torch.tensor([])
         
 
         # Applying random transformation

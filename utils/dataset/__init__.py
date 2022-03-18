@@ -223,7 +223,7 @@ class prostateDataset(Dataset):
             Return subdataset of all images from an original image
         """
 
-        new_dataset = copy.deepcopy(self)
+        new_dataset = copy.copy(self)
         new_dataset.metadatas = [x for x in new_dataset.metadatas if x["image_name"] == image_name]
 
         return new_dataset

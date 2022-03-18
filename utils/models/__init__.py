@@ -3,7 +3,7 @@ from torch import nn
 from torch import optim
 from torchvision import models
 
-class torchClassifier (nn.Module):
+class Model1 (nn.Module):
     """
         The aim of this classifier is to classify Prostatic anatomopathology according to the gleason
         For each image, the output is the two most probable gleason class, the loss is a weight of :

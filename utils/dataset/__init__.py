@@ -61,6 +61,7 @@ class prostateDataset(Dataset):
         self.slidding = (slidding_x, slidding_y)
         self.windows = (windows_size_x, windows_size_y)
         self.verbose = verbose
+        self.transform = True
         self.hflip = hflip
         self.vflip = vflip
 
@@ -193,13 +194,14 @@ class prostateDataset(Dataset):
 
         # Applying random transformation
         transformations = []
-        if self.hflip:
-            transformations.append(transforms.RandomHorizontalFlip())
-        if self.vflip:
-            transformations.append(transforms.RandomVerticalFlip())
+        if self.transform:
+            if self.hflip:
+                transformations.append(transforms.RandomHorizontalFlip())
+            if self.vflip:
+                transformations.append(transforms.RandomVerticalFlip())
 
-        if len(transformations) > 0:
-            image = nn.Sequential(*transformations)(image)
+            if len(transformations) > 0:
+                image = nn.Sequential(*transformations)(image)
 
         return image, label
 

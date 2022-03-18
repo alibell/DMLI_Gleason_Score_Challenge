@@ -181,6 +181,7 @@ class prostateDataset(Dataset):
     def __getitem__(self, index):
         img_metadata = self.metadatas[index]
         img_label = img_metadata["gleason_score"]
+        img_label_isup = img_metadata["isup_grade"]
         if "id" not in img_metadata.keys():
             img_id = img_metadata["path"].split("/")[-1].split(".")[0]
         else:
@@ -189,8 +190,9 @@ class prostateDataset(Dataset):
         img_path = f"{self.destination_folder}/{img_name}/{img_id}.jpg"
 
         image = read_image(img_path)
-        label = [0,0] if img_label == "negative" else [int(x) for x in img_label.split("+")]
+        label = [0,0, img_label_isup] if img_label == "negative" else ([int(x) for x in img_label.split("+")] + [img_label_isup])
         label = torch.tensor(label)
+        
 
         # Applying random transformation
         transformations = []

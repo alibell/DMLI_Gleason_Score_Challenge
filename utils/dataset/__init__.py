@@ -161,7 +161,9 @@ class prostateDataset(Dataset):
         if os.path.exists(destination_folder) == False:
             os.mkdir(destination_folder)
         i = 0
-
+        
+        if self.verbose:
+            print(f"Writting {image_path}")
         for window in tqdm(windows_list):
             # Only for non empty location
             image_mask = ((image[window[0]:window[1], window[2]:window[3]] != 255)*1).sum(axis=2) # List of non white location

@@ -45,9 +45,6 @@ class Model1 (nn.Module):
             nn.Linear(16, 6)
         ])
 
-        self.isup = nn.Sequential(*[
-            nn.Linear(16, 6)
-        ])
         
         self.optim = optim.Adam(self.parameters())
         self.criterion = nn.CrossEntropyLoss()
@@ -67,10 +64,9 @@ class Model1 (nn.Module):
         self.optim.zero_grad()
         
         # The loss is half good image prediction, half good isup prediction
-        score_1, score_2, isup = self.forward(x)
+        score_1, score_2 = self.forward(x)
         loss_1 = self.criterion(score_1, y[:,0])
         loss_2 = self.criterion(score_2, y[:,1])
-        loss_isup = self.criterion(isup, y[:,2])
         loss = (loss_1 + loss_2)
         
         # The loss is weighted by the visible surface

@@ -58,9 +58,8 @@ class Model1 (nn.Module):
         z = self.network(x)
         score_1 = self.score_1(z)
         score_2 = self.score_2(z)
-        isup = self.isup(z)
         
-        return score_1, score_2, isup
+        return score_1, score_2
         
     def fit (self, x, y):
         self.train()
@@ -72,12 +71,12 @@ class Model1 (nn.Module):
         loss_1 = self.criterion(score_1, y[:,0])
         loss_2 = self.criterion(score_2, y[:,1])
         loss_isup = self.criterion(isup, y[:,2])
-        loss = 0.5*(loss_1 + loss_2) + loss_isup
+        loss = (loss_1 + loss_2)
         
         # The loss is weighted by the visible surface
         ## Exemple : an almost empty image should have a low loss value because it cannot be informative
-        loss_weight = (x != 1).float().mean()
-        loss = loss_weight*loss
+        #loss_weight = (x != 1).float().mean()
+        #loss = loss_weight*loss
         
         loss.backward()
         self.optim.step()

@@ -41,8 +41,8 @@ def get_prediction(model, dataset, device):
             scores_2.append(score_2)
             isups.append(isup)
 
-        predictions[image_name]["gleason1"] = torch.argmax(torch.bincount(torch.cat(scores_1, axis=0).argmax(axis=1))).item()
-        predictions[image_name]["gleason2"] = torch.argmax(torch.bincount(torch.cat(scores_2, axis=0).argmax(axis=1))).item()
-        predictions[image_name]["isup_grad"] = torch.argmax(torch.bincount(torch.cat(isups, axis=0).argmax(axis=1))).item()
+        predictions[image_name]["gleason1"] = torch.bincount(torch.cat(scores_1, axis=0).argmax(axis=1)).cpu().numpy()
+        predictions[image_name]["gleason2"] = torch.bincount(torch.cat(scores_2, axis=0).argmax(axis=1)).cpu().numpy()
+        predictions[image_name]["isup_grad"] = torch.bincount(torch.cat(isups, axis=0).argmax(axis=1)).cpu().numpy()
 
     return predictions    

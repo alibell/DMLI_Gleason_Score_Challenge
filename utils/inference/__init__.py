@@ -30,19 +30,16 @@ def get_prediction(model, dataset, device):
         predictions[image_name] = {}
         scores_1 = []
         scores_2 = []
-        isups = []
 
         for x, y in image_dataloader:
             x = x.float().to(device)
             y_hat, loss_weight = model.predict(x)
-            score_1, score_2, isup = y_hat
+            score_1, score_2 = y_hat
             
             scores_1.append(score_1)
             scores_2.append(score_2)
-            isups.append(isup)
 
         predictions[image_name]["gleason1"] = torch.bincount(torch.cat(scores_1, axis=0).argmax(axis=1)).cpu().numpy()
         predictions[image_name]["gleason2"] = torch.bincount(torch.cat(scores_2, axis=0).argmax(axis=1)).cpu().numpy()
-        predictions[image_name]["isup_grad"] = torch.bincount(torch.cat(isups, axis=0).argmax(axis=1)).cpu().numpy()
 
     return predictions    

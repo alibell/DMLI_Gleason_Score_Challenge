@@ -25,7 +25,7 @@ def get_prediction(model, dataset, device):
     for image_name in tqdm(dataset.get_image_list()):
         image_dataset = dataset.get_subdataset(image_name)
         image_dataset.transform = False
-        image_dataloader = DataLoader(image_dataset, batch_size=6, shuffle=False)
+        image_dataloader = DataLoader(image_dataset, batch_size=12, shuffle=False)
         
         predictions[image_name] = {}
         scores_1 = []
@@ -33,13 +33,14 @@ def get_prediction(model, dataset, device):
 
         for x, y in image_dataloader:
             x = x.float().to(device)
-            y_hat, loss_weight = model.predict(x)
+            with torch.no_grad():
+                y_hat, loss_weight = model.predict(x)
             score_1, score_2 = y_hat
             
             scores_1.append(score_1)
             scores_2.append(score_2)
 
-        predictions[image_name]["gleason1"] = torch.bincount(torch.cat(scores_1, axis=0).argmax(axis=1)).cpu().numpy()
-        predictions[image_name]["gleason2"] = torch.bincount(torch.cat(scores_2, axis=0).argmax(axis=1)).cpu().numpy()
+        predictions[image_name]["gleason1"] = torch.cat(scores_1, axis=0).argmax(axis=1).cpu().numpy()
+        predictions[image_name]["gleason2"] = torch.cat(scores_2, axis=0).argmax(axis=1).cpu().numpy()
 
     return predictions    

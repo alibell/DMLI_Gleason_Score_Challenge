@@ -1,0 +1,4 @@
+"""
+    Classify images from predictions
+"""
+

@@ -7,11 +7,12 @@ def dataframe_from_predictions (prediction, main_df, bincount=True):
         .assign(index=lambda x: x["index"].apply(lambda y: y.split(".")[0])) \
         .rename(columns={"index":"image_id", "gleason1":"gleason1_predicted", "gleason2":"gleason2_predicted"})
 
-    main_df = main_df \
-        .assign(gleason_score_clean = lambda x: x["gleason_score"].replace("negative", "0+0")) \
-        .assign(gleason1=lambda x: x["gleason_score_clean"].apply(lambda y: y.split("+")[0]).astype("int")) \
-        .assign(gleason2=lambda x: x["gleason_score_clean"].apply(lambda y: y.split("+")[1]).astype("int")) \
-        .drop(columns=["gleason_score_clean"])
+    if "gleason_score" in main_df.columns:
+        main_df = main_df \
+            .assign(gleason_score_clean = lambda x: x["gleason_score"].replace("negative", "0+0")) \
+            .assign(gleason1=lambda x: x["gleason_score_clean"].apply(lambda y: y.split("+")[0]).astype("int")) \
+            .assign(gleason2=lambda x: x["gleason_score_clean"].apply(lambda y: y.split("+")[1]).astype("int")) \
+            .drop(columns=["gleason_score_clean"])
 
     if bincount:
         for column in ["gleason1_predicted", "gleason2_predicted"]:

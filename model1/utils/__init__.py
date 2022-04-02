@@ -1,4 +1,4 @@
-from numpy import bincount
+import numpy as np
 import pandas as pd
 
 def dataframe_from_predictions (prediction, main_df, bincount=True):

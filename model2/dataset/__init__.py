@@ -13,6 +13,7 @@ from torch.nn.utils import clip_grad_norm_
 from tqdm import tqdm
 from PIL import Image
 from sklearn.model_selection import train_test_split
+from ..data_augmentation import HEDJitter
 
 import matplotlib.pyplot as plt
 
@@ -98,16 +99,16 @@ class randomDataset (Dataset):
         # We loop over images and produce the negative dataframe
         negative_images_dict = []
         for negative_image in negative_images_name:
-        negative_image_slide = openslide.OpenSlide(f"/content/mvadlmi/train/train/{negative_image}.tiff")
-        negative_image_mask = np.array(negative_image_slide.read_region((0,0), 2, [self.image_size, self.image_size]))[:,:, 0:3].mean(axis=2)
-        negative_image_mask = (negative_image_mask <= 220).astype("int")
-        negative_image_mask_ratio = negative_image_slide.level_dimensions[0][0]/negative_image_slide.level_dimensions[2][0]
-        negative_image_locations = np.where(negative_image_mask == 1)
+            negative_image_slide = openslide.OpenSlide(f"/content/mvadlmi/train/train/{negative_image}.tiff")
+            negative_image_mask = np.array(negative_image_slide.read_region((0,0), 2, [self.image_size, self.image_size]))[:,:, 0:3].mean(axis=2)
+            negative_image_mask = (negative_image_mask <= 220).astype("int")
+            negative_image_mask_ratio = negative_image_slide.level_dimensions[0][0]/negative_image_slide.level_dimensions[2][0]
+            negative_image_locations = np.where(negative_image_mask == 1)
 
-        negative_image_locations_dict = dict(zip(["ymin", "xmin"], negative_image_locations))
-        negative_image_locations_dict["image_id"] = np.array([negative_image for i in range(len(negative_image_locations_dict["xmin"]))])
+            negative_image_locations_dict = dict(zip(["ymin", "xmin"], negative_image_locations))
+            negative_image_locations_dict["image_id"] = np.array([negative_image for i in range(len(negative_image_locations_dict["xmin"]))])
 
-        negative_images_dict.append(negative_image_locations_dict)
+            negative_images_dict.append(negative_image_locations_dict)
 
         negatives_df = pd.concat([pd.DataFrame(x) for x in negative_images_dict]) \
         .assign(
@@ -131,13 +132,13 @@ class randomDataset (Dataset):
         ).hexdigest()
 
         if self.cache in ("disk", "memory") and image_uid in self.cache_dict.keys():
-        if self.cache == "disk":
-            image_path = self.cache_dict[image_uid]
-            image = np.load(image_path)
-        else:
-            image = torch.clone(self.cache_dict[image_uid]).cpu()
-        
-        image = torch.tensor(image, dtype=torch.float32)
+            if self.cache == "disk":
+                image_path = self.cache_dict[image_uid]
+                image = np.load(image_path)
+            else:
+                image = torch.clone(self.cache_dict[image_uid]).cpu()
+            
+            image = torch.tensor(image, dtype=torch.float32)
 
         else:
             # Loading image
@@ -179,17 +180,17 @@ class randomDataset (Dataset):
 
         ## Random crop
         if self.random_crop:
-        image = self.random_crop(image)
+            image = self.random_crop(image)
         else:
-        image = self.resizer(image)
-        image = self.center_crop(image)
+            image = self.resizer(image)
+            image = self.center_crop(image)
 
         ## Normalize
         image = self.normalizer(image)
 
         ## Augmentation
         if self.augment:
-        image = self.random_hflip(self.random_vflip(image))
+            image = self.random_hflip(self.random_vflip(image))
         if random.random() <= 0.1:
             image = HEDJitter(0.05)(image)
         image = self.rotate(image)

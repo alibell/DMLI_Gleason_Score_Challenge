@@ -51,9 +51,9 @@ class imageMapper():
                 images_line = []
 
                 for xmin, ymin, xmax, ymax in image_map[i,:,:]:
-                # Getting image
-                tmp_image = slide.read_region((xmin, ymin), 0, (xmax-xmin, ymax-ymin))
-                images_line.append(np.array(tmp_image)[:,:, 0:3])
+                    # Getting image
+                    tmp_image = slide.read_region((xmin, ymin), 0, (xmax-xmin, ymax-ymin))
+                    images_line.append(np.array(tmp_image)[:,:, 0:3])
 
                 # Creating tensor
                 images_line_tensor = torch.tensor(np.stack(images_line), dtype=torch.float32)

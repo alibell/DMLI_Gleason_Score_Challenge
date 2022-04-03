@@ -196,3 +196,68 @@ class randomDataset (Dataset):
         image = self.rotate(image)
 
         return image, label
+
+class tilesDataset(Dataset):
+    def __init__ (self, tiles_path, labels, output_label, augment=True, resize=512):
+        super().__init__()
+        self.tiles_path = tiles_path
+        self.labels = labels
+        self.output_label = output_label
+
+        self.resize = resize
+        self.resizer = transforms.Resize(resize)
+        self.augment = augment
+        self.normalize = transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        self.hflip = transforms.RandomHorizontalFlip()
+        self.vflip = transforms.RandomVerticalFlip()
+        self.rotate = transforms.RandomRotation((-90, 90), fill=1)
+        self.jitter = 0.05
+
+        self.cache_folder = "/content/cache"
+
+    def __len__ (self):
+        return len(self.tiles_path)
+
+    def __getitem__ (self, idx):
+        # Get label
+        if self.labels is not None:
+            label = self.labels.iloc[idx,:][self.output_label]
+        else:
+            label = None
+        
+        if self.labels is not None:
+            label = torch.tensor(label)
+        else:
+            label = torch.tensor([0])
+
+        # Get image
+        image_path = self.tiles_path[idx]
+        image_name = image_path.split("/")[-1].split(".")[0]
+        cache_folder = self.cache_folder
+        resize = self.resize
+        cache_path = f"{cache_folder}/{image_name}_{resize}.pickle"
+
+        if os.path.exists(cache_path):
+            image_tensor = pickle.load(open(cache_path, "rb"))
+        else:
+            image = np.array(Image.open(image_path))
+            image = np.moveaxis(image, 2, 0)
+
+            # To tensor
+            image_tensor = torch.tensor(image, dtype=torch.float32)
+            image_tensor = self.resizer(image_tensor)
+
+            pickle.dump(image_tensor, open(cache_path, "wb"))
+
+        image_tensor = image_tensor/torch.tensor(255., dtype=torch.float32)
+
+        if self.augment:
+            if random.random() <= 0.7:
+                image_tensor = HEDJitter(self.jitter)(image_tensor)
+
+            image_tensor = self.vflip(self.hflip(image_tensor))
+            image_tensor = self.rotate(image_tensor)
+        
+        image_tensor = self.normalize(image_tensor)
+
+        return image_tensor, label

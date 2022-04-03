@@ -146,11 +146,11 @@ class randomDataset (Dataset):
             image = np.array(openslide.read_region([x, y], 0, [w, h]))[:,:,0:3]
 
             if self.cache in ("disk", "memory") and image_uid not in self.cache_dict.keys():
-            if self.cache == "disk":
-                image_path = f"{self.cache_disk_path}/{image_uid}.npz"
-                np.savez(image_path, image)
-            else:
-                self.cache_dict[image_uid] = torch.clone(image)
+                if self.cache == "disk":
+                    image_path = f"{self.cache_disk_path}/{image_uid}.npz"
+                    np.savez(image_path, image)
+                else:
+                    self.cache_dict[image_uid] = torch.clone(image)
             
             image = torch.tensor(image, dtype=torch.float32)
 
